@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 
@@ -19,6 +20,7 @@ public class DarkDesaturatedResources extends Resources {
     private final float minDesaturation;
     private SparseArray<ColorStateList> cache = new SparseArray<>();
 
+    @SuppressWarnings("WeakerAccess")
     public DarkDesaturatedResources(
             boolean isDarkMode,
             float desaturationAmount,
@@ -43,27 +45,53 @@ public class DarkDesaturatedResources extends Resources {
         this(isDarkMode, 0.25f, 0.75f, assets, metrics, config);
     }
 
+    // COLOR
+
+    @Override
+    public int getColor(int id) throws NotFoundException {
+        return getColorInternal(id, null);
+    }
+
     @Override
     public int getColor(int id, @Nullable Theme theme) throws NotFoundException {
+        return getColorInternal(id, theme);
+    }
+
+    private int getColorInternal(int id, @Nullable Theme theme) throws NotFoundException {
         if (isDarkMode) {
-            System.out.println("get color " + id);
-            int requestedColor = super.getColor(id, theme);
+            int requestedColor = resolveColor(id, theme);
             return ColorDesaturationUtils.desaturate(requestedColor, desaturationAmount, minDesaturation);
         }
-        return super.getColor(id, theme);
+        return resolveColor(id, theme);
+    }
+
+    @SuppressWarnings("deprecation")
+    private int resolveColor(int id, @Nullable Theme theme) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            return super.getColor(id, theme);
+        }
+        return super.getColor(id);
+    }
+
+    // COLOR STATE LIST
+
+    @NonNull
+    @Override
+    public ColorStateList getColorStateList(int id) throws NotFoundException {
+        return getColorStateListInternal(id, null);
     }
 
     @NonNull
     @Override
     public ColorStateList getColorStateList(int id, @Nullable Theme theme) throws NotFoundException {
-        if (!isDarkMode) {
-            return super.getColorStateList(id, theme);
-        }
-        final ColorStateList requestedColor = super.getColorStateList(id, theme);
+        return getColorStateListInternal(id, theme);
+    }
 
-        System.out.println("get color state list " + id);
-        System.out.println("opaque " + requestedColor.isOpaque());
-        System.out.println("stateful" + requestedColor.isStateful());
+    private ColorStateList getColorStateListInternal(int id, @Nullable Theme theme) throws NotFoundException {
+        if (!isDarkMode) {
+            return resolveColorStateList(id, theme);
+        }
+        final ColorStateList requestedColor = resolveColorStateList(id, theme);
 
         final ColorStateList cached = cache.get(id);
         if (cached != null) {
@@ -81,6 +109,16 @@ public class DarkDesaturatedResources extends Resources {
             return requestedColor;
         }
     }
+
+    @SuppressWarnings("deprecation")
+    private ColorStateList resolveColorStateList(int id, @Nullable Theme theme) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            return super.getColorStateList(id, theme);
+        }
+        return super.getColorStateList(id);
+    }
+
+    // REFLECTION
 
     private int[][] getStates(ColorStateList color) throws Exception {
         //noinspection JavaReflectionMemberAccess
