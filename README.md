@@ -45,6 +45,6 @@ implementation 'com.github.ologe:color-desaturation:1.0.0'
 ### Screenshots
 <div style="dispaly:flex">
     <img src="https://github.com/ologe/color-desaturation/blob/master/img/light_mode.png" width="50%">
-    <img src="https://github.com/ologe/color-desaturation/blob/master/img/light_mode.png" width="50%">
+    <img src="https://github.com/ologe/color-desaturation/blob/master/img/light_mode.png" width="49%">
    
 </div>
