@@ -22,13 +22,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setDarkMode()
 
-        darkModeFab.setOnClickListener {
+        darkModeFab?.setOnClickListener {
             isDarkMode = !isDarkMode
             setDarkMode()
         }
     }
 
-    private fun setDarkMode(){
+    private fun setDarkMode() {
         val flag = if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES
         else AppCompatDelegate.MODE_NIGHT_NO
 
@@ -37,11 +37,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun getResources(): Resources {
         val res = super.getResources()
-        if (customResources == null){
+        if (customResources == null) {
             val isDarkMode = res.getBoolean(R.bool.is_dark_mode)
             customResources = DarkDesaturatedResources(
                 isDarkMode, .5f, .5f,
-                res.assets, res.displayMetrics, res.configuration)
+                res.assets, res.displayMetrics, res.configuration
+            )
         }
         return customResources!!
     }
