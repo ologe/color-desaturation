@@ -1,11 +1,8 @@
 package dev.olog.lib;
 
-import android.content.res.AssetManager;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
-import android.util.DisplayMetrics;
 import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
@@ -25,11 +22,9 @@ public class DarkDesaturatedResources extends Resources {
             boolean isDarkMode,
             float desaturationAmount,
             float minDesaturation,
-            AssetManager assets,
-            DisplayMetrics metrics,
-            Configuration config
+            Resources resources
     ) {
-        super(assets, metrics, config);
+        super(resources.getAssets(), resources.getDisplayMetrics(), resources.getConfiguration());
         this.isDarkMode = isDarkMode;
         this.desaturationAmount = desaturationAmount;
         this.minDesaturation = minDesaturation;
@@ -38,11 +33,9 @@ public class DarkDesaturatedResources extends Resources {
     @SuppressWarnings("unused")
     public DarkDesaturatedResources(
             boolean isDarkMode,
-            AssetManager assets,
-            DisplayMetrics metrics,
-            Configuration config
+            Resources resources
     ) {
-        this(isDarkMode, 0.25f, 0.75f, assets, metrics, config);
+        this(isDarkMode, 0.25f, 0.75f, resources);
     }
 
     // COLOR
@@ -117,6 +110,8 @@ public class DarkDesaturatedResources extends Resources {
         }
         return super.getColorStateList(id);
     }
+
+
 
     // REFLECTION
 

@@ -40,8 +40,7 @@ class MainActivity : AppCompatActivity() {
         if (customResources == null) {
             val isDarkMode = res.getBoolean(R.bool.is_dark_mode)
             customResources = DarkDesaturatedResources(
-                isDarkMode, .5f, .5f,
-                res.assets, res.displayMetrics, res.configuration
+                isDarkMode, .5f, .5f, res
             )
         }
         return customResources!!
