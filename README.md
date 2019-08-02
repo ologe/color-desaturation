@@ -3,6 +3,10 @@
 This library allows to automatically **desaturate colors** when using **Dark theme** 
 as described in [Material Docs](https://material.io/design/color/dark-theme.html#ui-application)
 
+
+## Caveats
+- The library has some problem with material widgets, and I'm currently working to resolve this issue  
+
 ### Usage
 
 Simply add this to your BaseActivity and you're done
