@@ -5,37 +5,56 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.util.SparseArray;
 
+import androidx.annotation.FloatRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
+/**
+ * This class desaturates colors.
+ * See <a href="https://it.wikipedia.org/wiki/Hue_Saturation_Brightness">HSL</a> for more information.
+ */
 public class DarkDesaturatedResources extends Resources {
+
+    private static final float DEFAULT_DESATURATION_AMOUNT = 0.25f;
+    private static final float DEFAULT_DESATURATION_THRESHOLD = 0.75f;
 
     private final boolean isDarkMode;
     private final float desaturationAmount;
-    private final float minDesaturation;
-    private SparseArray<ColorStateList> cache = new SparseArray<>();
+    private final float desaturationThreshold;
+    private SparseArray<WeakReference<ColorStateList>> cache = new SparseArray<>();
 
-    @SuppressWarnings("WeakerAccess")
+    /**
+     * @param isDarkMode when true, the colors can be desaturated
+     * @param desaturationAmount the amount of saturation removed from the colors
+     * @param desaturationThreshold colors with a saturation above this, will be desaturated. This also
+     *                              represent the desaturation lower bound.
+     */
     public DarkDesaturatedResources(
             boolean isDarkMode,
-            float desaturationAmount,
-            float minDesaturation,
-            Resources resources
+            @FloatRange(from = 0, to = 1) float desaturationAmount,
+            @FloatRange(from = 0, to = 1) float desaturationThreshold,
+            @NonNull Resources resources
     ) {
         super(resources.getAssets(), resources.getDisplayMetrics(), resources.getConfiguration());
         this.isDarkMode = isDarkMode;
         this.desaturationAmount = desaturationAmount;
-        this.minDesaturation = minDesaturation;
+        this.desaturationThreshold = desaturationThreshold;
     }
 
+    /**
+     * Constructor that uses default values for desaturation amount and threshold
+     *
+     * @param isDarkMode when true, the colors can be desaturated
+     */
     @SuppressWarnings("unused")
     public DarkDesaturatedResources(
             boolean isDarkMode,
-            Resources resources
+            @NonNull Resources resources
     ) {
-        this(isDarkMode, 0.25f, 0.75f, resources);
+        this(isDarkMode, DEFAULT_DESATURATION_AMOUNT, DEFAULT_DESATURATION_THRESHOLD, resources);
     }
 
     // COLOR
@@ -53,7 +72,7 @@ public class DarkDesaturatedResources extends Resources {
     private int getColorInternal(int id, @Nullable Theme theme) throws NotFoundException {
         if (isDarkMode) {
             int requestedColor = resolveColor(id, theme);
-            return ColorDesaturationUtils.desaturate(requestedColor, desaturationAmount, minDesaturation);
+            return ColorDesaturationUtils.desaturate(requestedColor, desaturationAmount, desaturationThreshold);
         }
         return resolveColor(id, theme);
     }
@@ -84,18 +103,24 @@ public class DarkDesaturatedResources extends Resources {
         if (!isDarkMode) {
             return resolveColorStateList(id, theme);
         }
+
+        final WeakReference<ColorStateList> cachedRef = cache.get(id);
+
+        if (cachedRef != null) {
+            final ColorStateList colorStateList = cachedRef.get();
+            if (colorStateList != null){
+                return colorStateList;
+            }
+        }
+
         final ColorStateList requestedColor = resolveColorStateList(id, theme);
 
-        final ColorStateList cached = cache.get(id);
-        if (cached != null) {
-            return cached;
-        }
         try {
-            ColorStateList desaturated = new ColorStateList(
+            final ColorStateList desaturated = new ColorStateList(
                     getStates(requestedColor),
                     desaturateGroup(getColors(requestedColor))
             );
-            cache.append(id, desaturated);
+            cache.append(id, new WeakReference<>(desaturated));
             return desaturated;
         } catch (Throwable ex) {
             ex.printStackTrace();
@@ -131,7 +156,7 @@ public class DarkDesaturatedResources extends Resources {
 
     private int[] desaturateGroup(int[] colors) {
         for (int i = 0; i < colors.length; i++) {
-            colors[i] = ColorDesaturationUtils.desaturate(colors[i], desaturationAmount, minDesaturation);
+            colors[i] = ColorDesaturationUtils.desaturate(colors[i], desaturationAmount, desaturationThreshold);
         }
         return colors;
     }
