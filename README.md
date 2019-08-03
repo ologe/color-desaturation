@@ -43,7 +43,7 @@ allprojects {
 ```
 Step 2. Add the dependency
 ```groovy
-implementation 'com.github.ologe:color-desaturation:1.0'
+implementation 'com.github.ologe:color-desaturation:1.0.1'
 ```
 
 ### Screenshots
