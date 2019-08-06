@@ -27,7 +27,7 @@ abstract class BaseActivity : AppCompatActivity() {
 }
 ``` 
 <br>
-In this example `R.bool.dark_mode` is used to detect when is using dark mode, see the sample
+In this example `R.bool.dark_mode is. used to detect when is using dark mode, see the sample
 application for more information
 
 ## Getting started
@@ -43,7 +43,7 @@ allprojects {
 ```
 Step 2. Add the dependency
 ```groovy
-implementation 'com.github.ologe:color-desaturation:1.0.1'
+implementation 'com.github.ologe:color-desaturation:1.0.2'
 ```
 
 ### Screenshots
