@@ -18,9 +18,9 @@ public class ColorDesaturationUtils {
         if (hsl[1] > minDesaturation) {
             hsl[1] = MathUtils.clamp(
                     hsl[1] - amount,
-                    minDesaturation - 0.1f,
-                    1f)
-            ;
+                    minDesaturation,
+                    1f
+            );
         }
         return ColorUtils.HSLToColor(hsl);
     }
