@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ### 1.0.2
-- Added support for colors translucent colors
+- Added support for translucent colors
 
 ### 1.0.1
 - ?
